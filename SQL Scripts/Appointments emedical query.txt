@@ -1,0 +1,48 @@
+USE [MiMOSAUPGRADE];
+
+SELECT DISTINCT(cm.[MemberNo])
+	  ,CAST(fa.[ExamDate] AS DATE) ExamDate
+	  ,CAST(cmap.[AppointmentDate] AS DATE) Appointmentdate
+      ,cm.[LastName]
+      ,cm.[FirstName]
+      ,cm.[MiddleName]
+	  ,cma.[AddressLine1]
+	  ,cma.[AddressLine2]
+	  ,cma.[City]
+	  ,(DATEDIFF(year,cm.[BirthDate],cms.[CreatedDate])) Age
+	  ,cme.[EmailAddress]
+	  ,cmp.[PhoneNo]
+	  ,cm.[Gender]
+      ,cm.[MigrantType]
+      ,act.[ProjectDefinition]
+      ,act.[ServiceCode]
+	  ,cmap.[TimeSlot]
+	  ,cmap.[ScreeningSiteCode]
+	  ,CASE
+       WHEN cmap.[ScreeningSiteCode] ='PSNG101600001' THEN 'IOM MHAC Abuja'
+       WHEN cmap.[ScreeningSiteCode] ='PSNG101600002' THEN 'IOM MHAC Lagos'
+       END ScreeningSite
+	  ,cms.[mission]
+	  ,cms.[MedServiceCode]
+      ,cms.[MedServiceDescription]
+      ,cms.[Status]
+      ,fa.[FunctionalAreaCode]
+      ,fa.[Description]
+	  ,CAST(fa.[CreatedDate] AS DATE) CreatedDate
+      ,fa.[CreatedBy]
+  FROM [MiMOSAUPGRADE].[dbo].[CaseMemberMedicalService] AS cms
+  INNER JOIN [MiMOSAUPGRADE].[dbo].[CaseMember] AS cm
+  ON cms.[CaseMemberID] = cm.[CaseMemberID]
+  LEFT OUTER JOIN [MiMOSAUPGRADE].[dbo].[CaseMemberAddress] AS cma
+  ON cms.[CaseMemberID] = cma.[CaseMemberID]
+  LEFT OUTER JOIN [MiMOSAUPGRADE].[dbo].[CaseMemberEmail] AS cme
+  ON cme.[CaseMemberID] = cm.[CaseMemberID]
+  LEFT OUTER JOIN [MiMOSAUPGRADE].[dbo].[CaseMemberPhone] AS cmp
+  ON cmp.[CaseMemberID] = cm.[CaseMemberID]
+   LEFT OUTER JOIN [MiMOSAUPGRADE].[dbo].[CaseMemberAppointment] cmap
+  ON cm.[CaseMemberID] = cmap.[CaseMemberID]
+  LEFT OUTER JOIN [MiMOSAUPGRADE].[dbo].[Activity] AS act
+  ON  cm.[CaseNo] = act.[CaseNo]
+  RIGHT OUTER JOIN [MiMOSAUPGRADE].[dbo].[CaseMemberFunctionalArea] AS fa
+  ON cms.[CaseMemberID] = fa.[CaseMemberID]
+  WHERE cms.[mission] ='NG10'  AND act.[ActivityCode] ='MED' AND cms.[MedServiceDescription] = 'PE IOM' AND fa.[FunctionalAreaCode]='HA' AND CAST(cmap.[AppointmentDate] AS DATE) = '2024-08-30';

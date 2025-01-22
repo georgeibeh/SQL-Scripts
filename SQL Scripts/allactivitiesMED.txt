@@ -1,0 +1,30 @@
+USE [MiMOSAUPGRADE];
+SELECT DISTINCT(cm.[MemberNo])
+      ,CAST(cms.[StartDate] AS DATE) StartDate
+      ,CAST(cms.[CompletionDate] AS DATE) CompletionDate
+	  ,DATENAME(year,[CompletionDate]) Completion_Year
+	  ,DATENAME(month,[CompletionDate]) Completion_Month
+      ,cms.[MedServiceCode]
+      ,cms.[MedServiceDescription]
+      ,cms.[Status]
+      ,CAST(cms.[CreatedDate] AS DATE) CreatedDate
+      ,cms.[CreatedBy]
+      ,cms.[mission]
+	  ,cm.[Gender]
+	  ,cm.[MigrantType]
+      ,cm.[LastName]
+      ,cm.[FirstName]
+      ,cm.[MiddleName]
+      ,CAST(cm.[BirthDate] AS DATE) BirthDate
+	  ,(DATEDIFF(year,cm.[BirthDate],cms.[StartDate])) Age
+      ,act.[ProjectDefinition]
+      ,act.[ServiceCode]
+	  ,ed.[PanelSite]
+  FROM [MiMOSAUPGRADE].[dbo].[CaseMemberMedicalService] AS cms
+  INNER JOIN [MiMOSAUPGRADE].[dbo].[CaseMember] AS cm
+  ON cms.[CaseMemberID] = cm.[CaseMemberID]
+  LEFT OUTER JOIN [MiMOSAUPGRADE].[dbo].[CaseMemberMed_ExamDetails] AS ed
+  ON ed.[CaseMemberID] = cm.[CaseMemberID]
+  LEFT OUTER JOIN [MiMOSAUPGRADE].[dbo].[Activity] AS act
+  ON  cm.[CaseNo] = act.[CaseNo]
+  WHERE cms.[mission] ='NG10'  AND act.[ActivityCode] ='MED';

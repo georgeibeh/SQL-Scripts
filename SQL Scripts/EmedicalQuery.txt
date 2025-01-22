@@ -1,0 +1,57 @@
+USE [MiMOSAUPGRADE];
+
+SELECT DISTINCT(cm.[MemberNo])
+      ,cm.[CaseMemberID]
+	  ,CAST(fa.[ExamDate] AS DATE) ExamDate
+	  ,CAST(fa.[CreatedDate] AS DATE) CreatedDate
+      ,CAST(fa.[CompletionDate] AS DATE) CompletionDate
+      ,DATENAME(year,fa.[CompletionDate]) Completion_Year
+      ,DATENAME(month,fa.[CompletionDate]) Completion_Month
+      ,cms.[MedServiceCode]
+      ,cms.[MedServiceDescription]
+      ,cms.[Status]
+      ,CAST(fa.[CreatedDate] AS DATE) CreatedDate
+      ,cms.[CreatedBy]
+      ,cms.[mission]
+      ,cm.[Gender]
+      ,cm.[MigrantType]
+	  ,cm.[Category]
+      ,cm.[LastName]
+      ,cm.[FirstName]
+      ,cm.[MiddleName]
+	  ,cma.[AddressLine1]
+	  ,cma.[AddressLine2]
+	  ,cma.[City]
+	  ,cma.[StateCode]
+      ,(DATEDIFF(year,cm.[BirthDate],cms.[CreatedDate])) Age
+	  ,cme.[EmailAddress]
+	  ,cmp.[PhoneNo]
+      ,act.[ProjectDefinition]
+      ,act.[ServiceCode]
+      ,ed.[PanelSite]
+      ,fa.[FunctionalAreaCode]
+      ,fa.[Description]
+      ,fa.[Status]
+      ,fa.[OutcomeClassification]
+      ,fa.[CreatedBy]
+	  ,lab.[HepB_IsDone]
+	  ,lab.[HepC_IsDone]
+
+  FROM [MiMOSAUPGRADE].[dbo].[CaseMemberMedicalService] AS cms
+  INNER JOIN [MiMOSAUPGRADE].[dbo].[CaseMember] AS cm
+  ON cms.[CaseMemberID] = cm.[CaseMemberID]
+  LEFT OUTER JOIN [MiMOSAUPGRADE].[dbo].[CaseMemberAddress] AS cma
+  ON cms.[CaseMemberID] = cma.[CaseMemberID]
+  LEFT OUTER JOIN [MiMOSAUPGRADE].[dbo].[CaseMemberEmail] AS cme
+  ON cme.[CaseMemberID] = cm.[CaseMemberID]
+  LEFT OUTER JOIN [MiMOSAUPGRADE].[dbo].[CaseMemberPhone] AS cmp
+  ON cmp.[CaseMemberID] = cm.[CaseMemberID]
+  LEFT OUTER JOIN [MiMOSAUPGRADE].[dbo].[CaseMemberMed_ExamDetails] AS ed
+  ON ed.[CaseMemberID] = cm.[CaseMemberID]
+  LEFT OUTER JOIN [MiMOSAUPGRADE].[dbo].[Activity] AS act
+  ON  cm.[CaseNo] = act.[CaseNo]
+   LEFT OUTER JOIN [MiMOSAUPGRADE].[dbo].[CaseMemberMed_Laboratory] AS lab
+  ON cms.[CaseMemberID] = lab.[CaseMemberID]
+  RIGHT OUTER JOIN [MiMOSAUPGRADE].[dbo].[CaseMemberFunctionalArea] AS fa
+  ON cms.[CaseMemberID] = fa.[CaseMemberID]
+  WHERE cms.[mission] ='NG10'  AND act.[ActivityCode] ='MED' AND cms.[MedServiceDescription] = 'PE IOM' AND fa.[FunctionalAreaCode]='HA';

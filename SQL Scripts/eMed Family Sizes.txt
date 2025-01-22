@@ -1,0 +1,40 @@
+WITH cte 
+     AS (SELECT 
+                 CaseNo
+                ,size=count([caseNo]) 
+                FROM [MiMOSAUPGRADE].[NG10].[CaseMember] 
+                GROUP BY CaseNo)
+ 
+
+SELECT CFuncArea.[CaseMemberFunctionalAreaID]
+      ,CFuncArea.[CaseMemberID]
+      ,[FunctionalAreaCode]
+      ,act.servicecode
+      ,cm.CaseNo
+      ,cte.size
+      ,cm.AlienNo
+      ,cm.LastName
+      ,cm.FirstName
+      ,cm.Gender
+      ,CONVERT(int,ROUND(DATEDIFF(hour,cm.BirthDate ,GETDATE())/8766.0,0)) AS Age
+      ,cm.Category
+      ,mc.[Location]
+      ,[dbo].[udf_countrydescription_get](mc.DestinationCountry) as DestinationCountry    
+      ,[ExamDate] as PE_DATE
+      ,cm.BirthPlace
+      ,cm.CaseMemberStatus
+      ,cm.MigrantType
+      ,cm.RegistrationDate
+      ,cm.RelationToPrimaryApplicant
+      ,CFuncArea.[Description]
+      ,CFuncArea.[Status]
+      ,CFuncArea.[ExamDate]
+      ,CFuncArea.[OutcomeClassification]
+  FROM  [MiMOSAUPGRADE].BI10.Casemember as cm
+  INNER JOIN [MiMOSAUPGRADE].[BI10].[CaseMemberFunctionalArea] CFuncArea ON cm.CaseMemberID=CFuncArea.CaseMemberID
+  INNER JOIN [MiMOSAUPGRADE].[BI10].MigrantCase mc on mc.[CaseNo]=cm.[CaseNo]
+  INNER JOIN [MiMOSAUPGRADE].[BI10].Activity act on mc.[CaseNo]=act.[CaseNo]
+  INNER JOIN cte on cte.CaseNo=cm.[CaseNo]
+  WHERE [ExamDate]>'20221111'
+        AND [FunctionalAreaCode]='HA'
+                AND act.[ActivityCode]='MED'
